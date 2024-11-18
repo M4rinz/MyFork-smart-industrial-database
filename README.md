@@ -45,9 +45,9 @@ In alternative, you can use pgAdmin to import the database.
 
 ### Understanding the Architecture and E-R Schema
 
-    ![The following architecture Diagram shows the overall design of the Industry 5.0 data architecture, including real-time data flows and processing pipelines.](images/architecture_diagram.png)
+![The following architecture Diagram shows the overall design of the Industry 5.0 data architecture, including real-time data flows and processing pipelines.](images/architecture_diagram.png)
 
-    ![The following E-R Diagram Illustrates the relationships between entities in the database.] (images/er_schema.png)
+![The following E-R Diagram Illustrates the relationships between entities in the database.](images/er_schema.png)
 
 ### 🛠️ Tools & Technologies
 
