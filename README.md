@@ -22,8 +22,10 @@ The repository contains the following files and directories:
 └── 🧪 test_database.py
 ```
 
-1. **`export.sql`**A PostgreSQL database dump (compatible with TimescaleDB extension). This contains the schema and initial data required for the project. Instructions for importing this file are provided below.
-2. **`filling.py`**A Python script that populates the database using data from the provided CSV file.
+1. **`export.sql`**
+A PostgreSQL database dump (compatible with TimescaleDB extension). This contains the schema and initial data required for the project. Instructions for importing this file are provided below.
+2. **`filling.py`**
+A Python script that populates the database using data from the provided CSV file.
 3. **`smart_app_data.csv`**
    A CSV file containing real-time data used to fill the database for testing and demonstration purposes.
 
@@ -122,7 +124,7 @@ docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' <co
 Replace `<container_id_or_name>` with the ID or name of the Docker container running the TimescaleDB instance.
 
 ---
-### Testing the Database
+### 🧪 Testing the Database
 If you want to test the database, all you need to do is run the following command:
 
 ```bash
