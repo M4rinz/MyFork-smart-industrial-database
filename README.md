@@ -105,6 +105,25 @@ docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' <co
 
 Replace `<container_id_or_name>` with the ID or name of the Docker container running the TimescaleDB instance.
 
+---
+### Testing the Database
+If you want to test the database, all you need to do is run the following command:
+
+```bash
+pytest test_database.py
+```
+If you want more details about the tests, you can run the following command:
+
+```bash
+pytest test_database.py -v
+```
+More details about `pytest` can be found by running the following command:
+
+```bash
+pytest --help
+```
+---
+
 ### Understanding the Architecture and E-R Schema
 
 ![The following architecture Diagram shows the overall design of the Industry 5.0 data architecture, including real-time data flows and processing pipelines.](images/architecture_diagram.png)
