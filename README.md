@@ -6,7 +6,7 @@ This repository contains resources and tools to explore and implement a data arc
 
 ## 📁 Repository Contents
 
-1. **`export.sql`**A PostgreSQL database dump (compatible with PostgreSQL version 17). This contains the schema and initial data required for the project. Instructions for importing this file are provided below.
+1. **`export.sql`**A PostgreSQL database dump (compatible with TimescaleDB extension). This contains the schema and initial data required for the project. Instructions for importing this file are provided below.
 2. **`filling.py`**A Python script that populates the database using data from the provided CSV file.
 3. **`smart_app_data.csv`**
    A CSV file containing real-time data used to fill the database for testing and demonstration purposes.
