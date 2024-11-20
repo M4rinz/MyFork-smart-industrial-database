@@ -21,14 +21,25 @@ The repository contains the following files and directories:
 ├── 📊 smart_app_data.csv
 └── 🧪 test_database.py
 ```
-
-1. **`export.sql`**
-A PostgreSQL database dump (compatible with TimescaleDB extension). This contains the schema and initial data required for the project. Instructions for importing this file are provided below.
-2. **`filling.py`**
+In order the contents are:
+- **`backup.py`**
+A Python script that backs up the database.
+- **`build_db.sh`**
+A shell script that creates a new database in the TimescaleDB instance and imports the schema and initial data from the provided SQL file.
+- **`export.sql`**
+A PostgreSQL database dump (compatible with TimescaleDB extension). This contains the schema and initial data required for the project. It can be imported into the TimescaleDB instance using the `build_db.sh` script.
+- **`filling.py`**
 A Python script that populates the database using data from the provided CSV file.
-3. **`smart_app_data.csv`**
+- **`smart_app_data.csv`**
    A CSV file containing real-time data used to fill the database for testing and demonstration purposes.
-
+- **`images`**
+   A directory containing images used in the README file.
+- **`LICENSE`**
+   A standard MIT license file.
+- **`README.md`**
+   A detailed README file containing information about the project, setup instructions, and other relevant details.
+- **`test_database.py`**
+   A Python script that contains unit tests for the database functions (see the Testing section for more details).
 ---
 
 ## 🚀 Getting Started
