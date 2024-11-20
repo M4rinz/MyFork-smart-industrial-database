@@ -159,9 +159,3 @@ pytest --help
 
 ![The following E-R Diagram Illustrates the relationships between entities in the database.](images/er_schema.png)
 
-### 🛠️ Tools & Technologies
-
-- PostgreSQL 17
-- Python
-- CSV
-- pgAdmin (optional)
