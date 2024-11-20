@@ -2,7 +2,7 @@ import psycopg2
 import pandas as pd
 from os import path
 
-DB_HOST = "localhost"
+DB_HOST = "172.17.0.2"
 DB_NAME = "KPI_database"
 DB_USER = "postgres"
 DB_PASSWORD = "password"
@@ -47,6 +47,14 @@ try:
                 )
 
             conn.commit()
+            # Query the machines table to fetch all rows
+            cursor.execute("SELECT * FROM machines;")
+            machines = cursor.fetchall()
+
+            # Print the results of the query
+            print("\nPrint the results of the query':")
+            for row in machines:
+                print(row)
 
 except Exception as e:
     print(f"Errore: {e}")
