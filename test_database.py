@@ -1,6 +1,5 @@
 import pytest
 import psycopg2
-from unittest.mock import MagicMock
 
 # Parametri di connessione per il database
 DB_HOST = "172.17.0.2"
@@ -9,33 +8,51 @@ DB_USER = "postgres"
 DB_PASSWORD = "password"
 
 
-# Mock della funzione di connessione
-@pytest.fixture
-def mock_connection(mocker):
-    mock_conn = mocker.patch("psycopg2.connect")
-    mock_cursor = MagicMock()
-    mock_conn.return_value.cursor.return_value = mock_cursor
-    return mock_conn, mock_cursor
-
-
 # Test: connessione al database
-def test_database_connection(mock_connection):
-    mock_conn, mock_cursor = mock_connection
+def test_database_connection():
+    """
+    Testing of the connection to the database.
+    """
+    try:
+        # Connetti al database
+        with psycopg2.connect(
+            host=DB_HOST,
+            database=DB_NAME,
+            user=DB_USER,
+            password=DB_PASSWORD
+        ) as conn:
+            with conn.cursor() as cursor:
+                # Esegui una query semplice per verificare la connessione
+                cursor.execute("SELECT 1;")
+                result = cursor.fetchone()
+        # Verifica che il risultato della query sia valido
+        assert result == (1,), \
+            "La query SELECT 1 non ha restituito il valore atteso."
 
-    # Simula la connessione e l'esecuzione del codice
-    with psycopg2.connect(
-        host=DB_HOST,
-        database=DB_NAME,
-        user=DB_USER,
-        password=DB_PASSWORD
-    ) as conn:
-        with conn.cursor() as cursor:
-            cursor.execute("SELECT 1;")
-            cursor.fetchall()
-    # Verifica che psycopg2.connect sia stato chiamato con i parametri giusti
-    mock_conn.assert_called_with(
-        host=DB_HOST,
-        database=DB_NAME,
-        user=DB_USER,
-        password=DB_PASSWORD
-    )
+    except Exception as e:
+        pytest.fail(f"Connessione al database fallita: {e}")
+
+
+# Test: verifica che ci siano righe nella tabella machines
+def test_select_machines():
+    """
+    Execute a simple SELECT query on the machines table
+    and check that at least one row is returned.
+    """
+    try:
+        # Connetti al database
+        with psycopg2.connect(
+            host=DB_HOST,
+            database=DB_NAME,
+            user=DB_USER,
+            password=DB_PASSWORD
+        ) as conn:
+            with conn.cursor() as cursor:
+                cursor.execute("SELECT * FROM machines;")
+                rows = cursor.fetchall()
+        # Verifica che almeno una riga sia stata restituita
+        assert len(rows) > 0, \
+            "La tabella machines è vuota o non esiste."
+
+    except Exception as e:
+        pytest.fail(f"Errore durante l'esecuzione della query: {e}")
