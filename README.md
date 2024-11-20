@@ -154,8 +154,11 @@ pytest --help
 ---
 
 ### Understanding the Architecture and E-R Schema
+The following architecture Diagram shows the overall design of the Industry 5.0 data architecture, including real-time data flows and processing pipelines.
 
-![The following architecture Diagram shows the overall design of the Industry 5.0 data architecture, including real-time data flows and processing pipelines.](images/architecture_diagram.png)
+![architecture_diagram](images/architecture_diagram.png)
 
-![The following E-R Diagram Illustrates the relationships between entities in the database.](images/er_schema.png)
+The following E-R Diagram Illustrates the relationships between entities in the database schema.
+
+![er_schema](images/er_schema.png)
 
