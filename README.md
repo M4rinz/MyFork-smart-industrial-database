@@ -6,6 +6,22 @@ This repository contains resources and tools to explore and implement a data arc
 
 ## 📁 Repository Contents
 
+The repository contains the following files and directories:
+```bash
+📂 Project Root
+├── 🛠️ backup.py
+├── ⚙️ build_db.sh
+├── 📤 export.sql
+├── ✏️ filling.py
+├── 🖼️ images
+│   ├── 🖼️ architecture_diagram.png
+│   └── 🖼️ er_schema.png
+├── 📜 LICENSE
+├── 📖 README.md
+├── 📊 smart_app_data.csv
+└── 🧪 test_database.py
+```
+
 1. **`export.sql`**A PostgreSQL database dump (compatible with TimescaleDB extension). This contains the schema and initial data required for the project. Instructions for importing this file are provided below.
 2. **`filling.py`**A Python script that populates the database using data from the provided CSV file.
 3. **`smart_app_data.csv`**
