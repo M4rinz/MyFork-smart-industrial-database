@@ -67,9 +67,9 @@ def backup_postgres_database(db_name, user, password, host='localhost', port=543
         print(f"An error occurred during the backup: {e}")
 
 # Configuration
-DB_NAME = "SmartApps"
-DB_USER = "postgres"
-DB_PASSWORD = "2005"
+DB_NAME = "dbname"
+DB_USER = "username"
+DB_PASSWORD = "password"
 DB_HOST = "localhost"
 DB_PORT = 5432
 BACKUP_DIR = "backups_encrypted"
