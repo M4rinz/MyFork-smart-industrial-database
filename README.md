@@ -45,6 +45,7 @@ A Python script that populates the database using data from the provided CSV fil
    A Python script that contains unit tests for the database functions (see the Testing section for more details).
 ---
 ## 📜 Introduction
+
 This project aims to provide a data architecture framework for Industry 5.0 applications. 
 This repo is part of a larger project for the Smart Applications course at the University of Pisa.
 This architecture is made by using a customised version of `PostgreSQL` called `TimescaleDB` which is an open-source time-series database optimized for fast ingest and complex queries and `pgvector` which is a PostgreSQL extension that provides support for vector similarity search and indexing.
