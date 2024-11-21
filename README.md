@@ -45,6 +45,7 @@ A Python script that populates the database using data from the provided CSV fil
    A Python script that contains unit tests for the database functions (see the Testing section for more details).
 ---
 ## 📜 Introduction
+### Industry 5.0 Data Architecture for Smart Applications
 
 This project aims to provide a data architecture framework for Industry 5.0 applications. 
 This repo is part of a larger project for the Smart Applications course at the University of Pisa.
