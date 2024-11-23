@@ -12,7 +12,7 @@ The repository contains the following files and directories:
 📂 Project Root
 ├── 🛠️ backup.py
 ├── ⚙️ build_db.sh
-├── 📤 export.sql
+├── 📤 exports.sql
 ├── ✏️ filling.py
 ├── 🖼️ images
 │   ├── 🖼️ architecture_diagram.png
@@ -30,7 +30,7 @@ In order the contents are:
   A Python script that backs up the database and saves the encrypted backup file to the `backups_encrypted` directory.
 - **`build_db.sh`**
   A shell script that creates a new database in the smart-database instance and imports the schema and initial data from the provided SQL file.
-- **`export.sql`**
+- **`exports.sql`**
   A PostgreSQL database dump. This contains the schema and initial data required for the project. It can be imported into the smart-database instance using the `build_db.sh` script.
 - **`filling.py`**
   A Python script that populates the database using data from the provided CSV file.
@@ -113,7 +113,7 @@ If you remove the container, all the data will be stored in the `data` directory
    ./build_db.sh smart-database-container exports.sqls KPI_Database
 ```
 
-This will create a new database named `KPI_Database` in the `smart-database-container` instance and import the schema and initial data from the `export.sql` file.
+This will create a new database named `KPI_Database` in the `smart-database-container` instance and import the schema and initial data from the `exports.sql` file.
 
 ### Using pgAdmin (optional)
 
