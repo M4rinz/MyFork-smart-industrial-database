@@ -52,8 +52,9 @@ In order the contents are:
 ### Industry 5.0 Data Architecture for Smart Applications
 
 This project aims to provide a data architecture framework for Industry 5.0 applications. This repo is part of a larger project for the Smart Applications course at the University of Pisa. This architecture is made by using a customised version of `PostgreSQL`. This `PostgreSQL` instance includes two extensions:
- - **`TimescaleDB`** which is an open-source time-series extension that allows PostgreSQL to be optimized for fast ingest and complex queries; and 
- - **`pgvector`** which is a PostgreSQL extension that provides support for vector similarity search and indexing. The architecture supports real-time data ingestion and processing for smart applications and can be used for educational purposes in a university course.
+
+- **`TimescaleDB`** which is an open-source time-series extension that allows PostgreSQL to be optimized for fast ingest and complex queries; and
+- **`pgvector`** which is a PostgreSQL extension that provides support for vector similarity search and indexing. The architecture supports real-time data ingestion and processing for smart applications and can be used for educational purposes in a university course.
 
 ## 🚀 Getting Started
 
@@ -109,7 +110,7 @@ If you remove the container, all the data will be stored in the `data` directory
 ```
 
 ```bash
-   ./build_db.sh smart-database-container export.sql KPI_Database
+   ./build_db.sh smart-database-container exports.sqls KPI_Database
 ```
 
 This will create a new database named `KPI_Database` in the `smart-database-container` instance and import the schema and initial data from the `export.sql` file.
@@ -183,8 +184,11 @@ The following E-R Diagram Illustrates the relationships between entities in the 
 ![er_schema](images/er_schema.png)
 
 ---
+
 ## 🔐 DevSecOps
+
 DevSecOps is a set of practices that combines software development (Dev) with IT operations (Ops) and security (Sec). It aims to integrate security into the software development process from the beginning, rather than treating it as an afterthought. The following security measures have been implemented in this project:
+
 - **password hashing + salt for the postgres users passwords**: The passwords of the users of postgres by default are hashed and salted to ensure that they are not stored in plain text inside the database.
 - **encryption of specific columns for the personal data**: The personal data of the users is encrypted before being stored in the database. This ensures that the data is secure and cannot be accessed by unauthorized users.
 - **encryption of the database backups**: The database backups are encrypted before being saved to the `backups_encrypted` directory. This ensures that the backup files are secure and cannot be accessed by unauthorized users.
