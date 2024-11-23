@@ -48,14 +48,6 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# Create the pgvector extension
-echo "🔧 Creating pgvector extension..."
-docker exec -i "$CONTAINER_NAME" psql -U postgres -d "$DATABASE_NAME" -c "CREATE EXTENSION IF NOT EXISTS vector;"
-if [ $? -ne 0 ]; then
-    echo "❌ Error creating pgvector extension."
-    exit 1
-fi
-echo "✅ pgvector extension created successfully."
 
 # Clean up: Remove the dump file from the container
 echo "🧹 Cleaning up: Removing the dump file from the container..."
