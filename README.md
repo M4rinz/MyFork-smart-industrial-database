@@ -54,7 +54,8 @@ In order the contents are:
 This project aims to provide a data architecture framework for Industry 5.0 applications. This repo is part of a larger project for the Smart Applications course at the University of Pisa. This architecture is made by using a customised version of `PostgreSQL`. This `PostgreSQL` instance includes two extensions:
 
 - **`TimescaleDB`** which is an open-source time-series extension that allows PostgreSQL to be optimized for fast ingest and complex queries; and
-- **`pgvector`** which is a PostgreSQL extension that provides support for vector similarity search and indexing. The architecture supports real-time data ingestion and processing for smart applications and can be used for educational purposes in a university course.
+- **`pgvector`** which is a PostgreSQL extension that provides support for vector similarity search and indexing. The architecture supports real-time data ingestion and processing for smart applications and can be used for educational purposes in a university course; and
+- **`pgcrypto`** which is a PostgreSQL extension that provides cryptographic functions for encrypting and decrypting data.
 
 ## 🚀 Getting Started
 
