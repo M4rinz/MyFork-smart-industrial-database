@@ -83,7 +83,8 @@ def test_select_personal_data():
         pytest.fail(f"Error during query execution: {e}")
 
 
-# Test: select all the rows from maintenance_records table related to a specific machine
+# Test: select all the rows from maintenance_records table related to a
+# specific machine
 def test_select_maintenance_records():
     """
     Execute a simple SELECT query on the maintenance_records table
