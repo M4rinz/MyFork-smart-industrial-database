@@ -1,0 +1,6 @@
+iniconfig
+packaging
+pluggy
+psycopg2
+pytest
+pytest-mock
