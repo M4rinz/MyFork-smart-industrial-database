@@ -74,8 +74,13 @@ git clone https://github.com/Kreative-Performative-Individuals/smart-industrial-
 ```
 
 This will create a new directory named `smart-industrial-database` in your current working directory.
+Navigate to the cloned repository and install the required Python packages in your enviroment by using the following command:
 
-Navigate to the cloned repository and build the Docker image using the following command:
+```bash
+pip install -r requirements.txt
+```
+
+Build the Docker image using the following command:
 
 ```bash
 docker build -t smart-database .
