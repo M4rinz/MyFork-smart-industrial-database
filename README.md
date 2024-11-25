@@ -1,8 +1,19 @@
+**Table of Contents**
+- [Industry 5.0 Data Architecture for Smart Applications](#industry-50-data-architecture-for-smart-applications)
+  - [📁 Repository Contents](#-repository-contents)
+  - [📜 Introduction](#-introduction)
+    - [Industry 5.0 Data Architecture for Smart Applications](#industry-50-data-architecture-for-smart-applications-1)
+  - [🚀 Getting Started](#-getting-started)
+    - [Prerequisites](#prerequisites)
+    - [Setting Up the Database](#setting-up-the-database)
+    - [Using pgAdmin (optional)](#using-pgadmin-optional)
+  - [🧪 Testing the Database](#-testing-the-database)
+  - [Understanding the Architecture and E-R Schema of the Database](#understanding-the-architecture-and-e-r-schema-of-the-database)
+  - [🔐 DevSecOps](#-devsecops)
+
 # Industry 5.0 Data Architecture for Smart Applications
 
 This repository contains resources and tools to explore and implement a data architecture framework designed for Industry 5.0. It supports real-time data ingestion and processing for smart applications and can be used for educational purposes in a university course.
-
----
 
 ## 📁 Repository Contents
 
