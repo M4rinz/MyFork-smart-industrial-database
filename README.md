@@ -1,4 +1,5 @@
 **Table of Contents**
+
 - [Industry 5.0 Data Architecture for Smart Applications](#industry-50-data-architecture-for-smart-applications)
   - [📁 Repository Contents](#-repository-contents)
   - [📜 Introduction](#-introduction)
@@ -109,7 +110,7 @@ docker images
 2. Run the following command to start the smart-database Docker container:
 
 ```bash
-   $ docker run -itd -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=password -p 5432:5432 -v ./data:/var/lib/postgresql/data --name smart-database-container smart-database
+docker run -itd -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=password -p 5432:5432 -v ./data:/var/lib/postgresql/data --name smart-database-container smart-database
 ```
 
 This command will start a new Docker container named `smart-database-container` with the required environment variables and port mappings. From now on, you can use this container to interact with the smart-database instance.
@@ -127,7 +128,7 @@ If you remove the container, all the data will be stored in the `data` directory
 ```
 
 ```bash
-   ./build_db.sh smart-database-container exports.sqls KPI_Database
+   ./build_db.sh smart-database-container exports.sql KPI_Database
 ```
 
 This will create a new database named `KPI_Database` in the `smart-database-container` instance and import the schema and initial data from the `exports.sql` file.
@@ -145,7 +146,7 @@ docker pull dpage/pgadmin4:latest
 Run the following command to start the pgAdmin Docker container:
 
 ```bash
-$ docker run --name pgadmin-postgres -p 5051:80 -e "PGADMIN_DEFAULT_EMAIL=admin@admin.com" -e "PGADMIN_DEFAULT_PASSWORD=password" -d dpage/pgadmin4
+docker run --name pgadmin-postgres -p 5051:80 -e "PGADMIN_DEFAULT_EMAIL=admin@admin.com" -e "PGADMIN_DEFAULT_PASSWORD=password" -d dpage/pgadmin4
 ```
 
 Open your web browser and navigate to `http://localhost:5051`. You will be prompted to log in with the default credentials. Use the following credentials to log in:
