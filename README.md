@@ -22,17 +22,23 @@ The repository contains the following files and directories:
 
 ```bash
 📂 Project Root
-├── 🛠️ backup.py
-├── ⚙️ build_db.sh
-├── 📤 exports.sql
-├── ✏️ filling.py
+├── 🗄️ backup.py
+├── 🔐 backups_decryption
+│   ├── 🔓 decrypt_backup.py
+│   ├── 🔑 enc_key.key
+│   └── 🛠️ generate_key.py
+├── 🔒 backups_encrypted
+├── 🛠️ build_db.sh
+├── 🐳 dockerfile
+├── 🗂️ exports.sql
 ├── 🖼️ images
-│   ├── 🖼️ architecture_diagram.png
-│   └── 🖼️ er_schema.png
+│   ├── 🏗️ architecture_diagram.png
+│   └── 📊 er_schema.png
 ├── 📜 LICENSE
+├── 📝 query_template.py
 ├── 📖 README.md
+├── 📦 requirements.txt
 ├── 📊 smart_app_data.csv
-├── 🐋 dockerfile
 └── 🧪 test_database.py
 ```
 
@@ -40,23 +46,27 @@ In order the contents are:
 
 - **`backup.py`**
   A Python script that backs up the database and saves the encrypted backup file to the `backups_encrypted` directory.
+- **`backups_decryption`**
+  - **`decrypt_backup.py`**
+    A Python script that decrypts the encrypted backup files from the `backups_encrypted` directory.
+  - **`enc_key.key`** A file containing the encryption key used to encrypt the database backups.
+  - **`generate_key.py`**
+    A Python script that generates a new encryption key and saves it to the `enc_key.key` file.
+- **`backups_encrypted`** 
+  A directory containing encrypted database backups.
 - **`build_db.sh`**
   A shell script that creates a new database in the smart-database instance and imports the schema and initial data from the provided SQL file.
-- **`exports.sql`**
-  A PostgreSQL database dump. This contains the schema and initial data required for the project. It can be imported into the smart-database instance using the `build_db.sh` script.
-- **`filling.py`**
-  A Python script that populates the database using data from the provided CSV file.
-- **`smart_app_data.csv`**
-  A CSV file containing real-time data used to fill the database for testing and demonstration purposes.
-- **`images`**
-  A directory containing images used in the README file.
-- **`LICENSE`**
-  A standard MIT license file.
-- **`README.md`**
-  A detailed README file containing information about the project, setup instructions, and other relevant details.
 - **`dockerfile`**
   A Dockerfile that can be used to build a custom Docker image for the project.
-- **`test_database.py`**
+- **`exports.sql`**
+  A PostgreSQL database dump. This contains the schema and initial data required for the project. It can be imported into the smart-database instance using the `build_db.sh` script.
+- **`smart_app_data.csv`** 
+  A CSV file containing real-time data used to fill the database for testing and demonstration purposes.
+- **`query_template`**
+  A Python file to show how to query the database.
+- **`requirements.txt`**
+  A file containing the required Python packages for the project.
+- **`test_database.py`** 
   A Python script that contains unit tests for the database functions (see the Testing section for more details).
 
 ## 📜 Introduction
