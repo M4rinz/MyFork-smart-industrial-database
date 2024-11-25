@@ -128,10 +128,10 @@ If you remove the container, all the data will be stored in the `data` directory
 ```
 
 ```bash
-   ./build_db.sh smart-database-container exports.sql KPI_Database
+   ./build_db.sh smart-database-container exports.sql KPI_database
 ```
 
-This will create a new database named `KPI_Database` in the `smart-database-container` instance and import the schema and initial data from the `exports.sql` file.
+This will create a new database named `KPI_database` in the `smart-database-container` instance and import the schema and initial data from the `exports.sql` file.
 
 ### Using pgAdmin (optional)
 
