@@ -1,6 +1,6 @@
 FROM postgres:16
 
-# Install the necessary dependencies for building TimescaleDB from source and pgvector
+# Install the necessary dependencies for building TimescaleDB from source, pgvector, and cron
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     postgresql-server-dev-16 \
@@ -8,6 +8,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     cmake \
     ca-certificates \
+    cron \
     && rm -rf /var/lib/apt/lists/*
 
 # Install TimescaleDB 2.17.2 and build it from source
