@@ -1,6 +1,6 @@
 FROM postgres:16
 
-# Install the necessary dependencies for building TimescaleDB from source, pgvector, and cron
+# Install the necessary dependencies for building TimescaleDB from source and pgvector
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     postgresql-server-dev-16 \
@@ -9,6 +9,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     cmake \
     ca-certificates \
     cron \
+    python3 \
+    python3-pip \
+    python3-dev \
+    python3-venv \
+    nano \
     && rm -rf /var/lib/apt/lists/*
 
 # Install TimescaleDB 2.17.2 and build it from source
@@ -27,15 +32,33 @@ RUN git clone https://github.com/pgvector/pgvector.git \
     && cd .. \
     && rm -rf pgvector
 
-# Add TimescaleDB to the shared_preload_libraries
-RUN echo "shared_preload_libraries = 'timescaledb'" >> /usr/share/postgresql/postgresql.conf.sample
-
-# Create the data directory for PostgreSQL and expose it as a volume
-RUN mkdir -p /var/lib/postgresql/data
+# Setup the data directory and permissions
+RUN mkdir -p /var/lib/postgresql/data && chown -R postgres:postgres /var/lib/postgresql/data
 VOLUME /var/lib/postgresql/data
 
-# Expose the PostgreSQL port
-EXPOSE 5432
+# Add PostgreSQL custom configurations
+RUN echo "listen_addresses = '*'" >> /usr/share/postgresql/postgresql.conf.sample \
+    && echo "shared_preload_libraries = 'timescaledb'" >> /usr/share/postgresql/postgresql.conf.sample
 
-# Start PostgreSQL
-CMD ["postgres"]
+# Create a virtual environment and install Python dependencies inside it
+RUN python3 -m venv /opt/venv && /opt/venv/bin/pip install psycopg2-binary fastapi uvicorn pandas
+
+# Set environment variables for PostgreSQL
+ENV POSTGRES_USER=postgres
+ENV POSTGRES_PASSWORD=password
+ENV POSTGRES_DB=smart_db
+
+# Expose PostgreSQL and FastAPI ports
+EXPOSE 5432
+EXPOSE 8000
+
+# Copy the application directory into the container
+COPY ./app /app
+
+# Change ownership of the app directory to avoid permission issues
+RUN chown -R postgres:postgres /app
+
+# Run PostgreSQL as the default user and start FastAPI app
+USER postgres
+
+CMD ["/bin/bash", "-c", "docker-entrypoint.sh postgres & sleep 10 && /opt/venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000"]
