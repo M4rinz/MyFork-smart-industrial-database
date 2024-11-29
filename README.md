@@ -1,5 +1,4 @@
 **Table of Contents**
-
 - [Industry 5.0 Data Architecture for Smart Applications](#industry-50-data-architecture-for-smart-applications)
   - [📁 Repository Contents](#-repository-contents)
   - [📜 Introduction](#-introduction)
@@ -9,8 +8,10 @@
     - [Setting Up the Database](#setting-up-the-database)
     - [Using pgAdmin (optional)](#using-pgadmin-optional)
   - [🧪 Testing the Database](#-testing-the-database)
+  - [Try our API](#try-our-api)
   - [Understanding the Architecture and E-R Schema of the Database](#understanding-the-architecture-and-e-r-schema-of-the-database)
   - [🔐 DevSecOps](#-devsecops)
+
 
 # Industry 5.0 Data Architecture for Smart Applications
 
@@ -200,6 +201,10 @@ pytest --help
 ```
 
 ---
+## Try our API
+After you have started the container and filled the database by using `build_db.sh` can try our endpoints by visiting **http://localhost:8000/docs**.
+
+There you can find the instructions and the description of the endpoints and try them using the GUI.
 
 ## Understanding the Architecture and E-R Schema of the Database
 
