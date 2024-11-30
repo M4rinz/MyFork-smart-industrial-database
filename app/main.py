@@ -119,7 +119,14 @@ async def fetch_production_logs():
         print(f"An error occurred: {e}")
         return {"message": "An error occurred", "error": str(e)}
 
-# Endpoint requested from group 3, to get informations based on the parameters passed.
+# TODO, implement a query to return requested data to allow group 3 to do their calculations.
+# Please check the data format of the return. 
+# The query should filter based on the parameters: 
+#     machine_name, asset_id, kpi, operation, timestamp_start, timestamp_end
+# and should return the records with the same information, 
+# so a list of records like:
+#     machine_name, asset_id, kpi, operation, timestamp_start, timestamp_end
+# Test the endpoint before pushing so that we are sure that group 3 can use it.
 @app.get("/historical_data")
 async def get_historical_data(
     machine_name: str,
@@ -151,9 +158,28 @@ async def get_historical_data(
     except Exception as e:
         print(f"An error occurred: {e}")
         return {"message": "An error occurred", "error": str(e)}
+        
+# TODO, implement the query for the endpoint.
+# This endpoint should allow group 3 to post data inside the database. 
+# The data that should be stored is like this 
+# datapoint = {
+#     'timestamp': 'timepoint',
+#     'isset_id': 'ast-yhccl1zjue2t',
+#     'name': 'metal_cutting',
+#     'kpi': 'time',
+#     'operation': 'working',
+#     'sum': float, 
+#     'avg': float,
+#     'min': float,
+#     'max': float,
+#     'var': float
+# }
 
-@app.post("/anomaly_data")
-async def get_anomaly_data(data: AnomalyDataRequest):
+# And should go in the real-time data table. The AnomlayDataRequest object stores the informations that are needed to perform the query
+# there is an extra field called anomaly, that can be ignored if we don't want to use that, but they can identify anomalies so it's 
+# included. Test the endponits before pushing so that we are sure group 3 can use them.
+@app.post("/store_datapoint")
+async def post_data_point(data: AnomalyDataRequest):
     try:
         with psycopg2.connect(
             host=DB_HOST,
@@ -181,21 +207,3 @@ async def get_anomaly_data(data: AnomalyDataRequest):
     except Exception as e:
         print(f"An error occurred: {e}")
         return {"message": "An error occurred", "error": str(e)}
-
-"""
-curl -X POST "http://127.0.0.1:8000/anomaly_data" \
--H "Content-Type: application/json" \
--d '{
-  "timestamp": "2024-11-30T12:00:00",
-  "isset_id": "ABC123",
-  "name": "Machine A",
-  "kpi": "Production Rate",
-  "operation": "Normal",
-  "sum": 1000.5,
-  "avg": 50.2,
-  "min": 10.1,
-  "max": 100.0,
-  "var": 15.5,
-  "anomaly": "None"
-}'
-"""
