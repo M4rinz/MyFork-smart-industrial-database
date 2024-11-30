@@ -197,7 +197,7 @@ jobs:
         with:
           image-ref: 'smart-database'
           format: 'sarif'
-          exit-code: '1'  #With exit-code:1 it fails if vulnerabilities are found
+          exit-code: '1'  # With exit-code:1 it fails if vulnerabilities are found
           vuln-type: 'os,library' # default values
           severity: 'CRITICAL,HIGH'
           output: 'trivy-container_sarif-report.sarif'
