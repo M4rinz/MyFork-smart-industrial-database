@@ -206,7 +206,9 @@ pytest --help
 
 ## Try our API
 
-After you have started the container and filled the database by using `build_db.sh` can try our endpoints by visiting **http://localhost:8002/docs**.
+We implemented our endpoints using FastAPI.
+
+After you have started the container and filled the database by using `build_db.sh`, you can try our endpoints by visiting **http://localhost:8002/docs**.
 
 There you can find the instructions and the description of the endpoints and try them using the GUI.
 
