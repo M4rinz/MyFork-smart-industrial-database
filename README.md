@@ -121,12 +121,13 @@ docker images
 2. Run the following command to start the smart-database Docker container:
 
 ```bash
-docker run -d --name smart-database-container -p 5432:5432 -p 8000:8000 smart-database
+docker volume create pg_data
+docker run -d --name smart-database-container   -p 5432:5432 -p 8000:8000 -v pg_data:/var/lib/postgresql/data  smart-database
 ```
 
 This command will start a new Docker container named `smart-database-container` with the required environment variables and port mappings. From now on, you can use this container to interact with the smart-database instance.
 You can check the list of running Docker containers using the following command:
-
+The volume `pg_data` contains data for the persistency of the database.
 ```bash
 docker ps
 ```
