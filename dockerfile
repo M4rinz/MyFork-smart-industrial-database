@@ -46,7 +46,7 @@ RUN python3 -m venv /opt/venv && /opt/venv/bin/pip install psycopg2-binary fasta
 # Set environment variables for PostgreSQL
 ENV POSTGRES_USER=postgres
 ENV POSTGRES_PASSWORD=password
-ENV POSTGRES_DB=smart_db
+ENV POSTGRES_DB=KPI_database
 
 # Expose PostgreSQL and FastAPI ports
 EXPOSE 5432
