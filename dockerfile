@@ -41,16 +41,11 @@ RUN echo "listen_addresses = '*'" >> /usr/share/postgresql/postgresql.conf.sampl
     && echo "shared_preload_libraries = 'timescaledb'" >> /usr/share/postgresql/postgresql.conf.sample
 
 # Create a virtual environment and install Python dependencies inside it
-RUN python3 -m venv /opt/venv && /opt/venv/bin/pip install psycopg2-binary fastapi uvicorn pandas
-
-# Set environment variables for PostgreSQL
-ENV POSTGRES_USER=postgres
-ENV POSTGRES_PASSWORD=password
-ENV POSTGRES_DB=KPI_database
+RUN python3 -m venv /opt/venv && /opt/venv/bin/pip install psycopg2-binary fastapi uvicorn pandas python-dotenv
 
 # Expose PostgreSQL and FastAPI ports
 EXPOSE 5432
-EXPOSE 8000
+EXPOSE 8002
 
 # Copy the application directory into the container
 COPY ./app /app
@@ -61,4 +56,4 @@ RUN chown -R postgres:postgres /app
 # Run PostgreSQL as the default user and start FastAPI app
 USER postgres
 
-CMD ["/bin/bash", "-c", "docker-entrypoint.sh postgres & sleep 10 && /opt/venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000"]
+CMD ["/bin/bash", "-c", "docker-entrypoint.sh postgres & sleep 10 && /opt/venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8002"]
