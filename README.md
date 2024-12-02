@@ -9,6 +9,7 @@
     - [Setting Up the Database](#setting-up-the-database)
     - [Using pgAdmin (optional)](#using-pgadmin-optional)
   - [🧪 Testing the Database](#-testing-the-database)
+  - [Try our API](#try-our-api)
   - [Understanding the Architecture and E-R Schema of the Database](#understanding-the-architecture-and-e-r-schema-of-the-database)
   - [🔐 DevSecOps](#-devsecops)
 
@@ -52,7 +53,7 @@ In order the contents are:
   - **`enc_key.key`** A file containing the encryption key used to encrypt the database backups.
   - **`generate_key.py`**
     A Python script that generates a new encryption key and saves it to the `enc_key.key` file.
-- **`backups_encrypted`** 
+- **`backups_encrypted`**
   A directory containing encrypted database backups.
 - **`build_db.sh`**
   A shell script that creates a new database in the smart-database instance and imports the schema and initial data from the provided SQL file.
@@ -60,13 +61,13 @@ In order the contents are:
   A Dockerfile that can be used to build a custom Docker image for the project.
 - **`exports.sql`**
   A PostgreSQL database dump. This contains the schema and initial data required for the project. It can be imported into the smart-database instance using the `build_db.sh` script.
-- **`smart_app_data.csv`** 
+- **`smart_app_data.csv`**
   A CSV file containing real-time data used to fill the database for testing and demonstration purposes.
 - **`query_template`**
   A Python file to show how to query the database.
 - **`requirements.txt`**
   A file containing the required Python packages for the project.
-- **`test_database.py`** 
+- **`test_database.py`**
   A Python script that contains unit tests for the database functions (see the Testing section for more details).
 
 ## 📜 Introduction
@@ -120,11 +121,13 @@ docker images
 2. Run the following command to start the smart-database Docker container:
 
 ```bash
-docker run -itd -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=password -p 5432:5432 -v ./data:/var/lib/postgresql/data --name smart-database-container smart-database
+docker volume create pg_data
+docker run -d --name smart-database-container   -p 5432:5432 -p 8002:8002 -v pg_data:/var/lib/postgresql/data  smart-database
 ```
 
 This command will start a new Docker container named `smart-database-container` with the required environment variables and port mappings. From now on, you can use this container to interact with the smart-database instance.
 You can check the list of running Docker containers using the following command:
+The volume `pg_data` contains data for the persistency of the database.
 
 ```bash
 docker ps
@@ -200,6 +203,14 @@ pytest --help
 ```
 
 ---
+
+## Try our API
+
+We implemented our endpoints using FastAPI.
+
+After you have started the container and filled the database by using `build_db.sh`, you can try our endpoints by visiting **http://localhost:8002/docs**.
+
+There you can find the instructions and the description of the endpoints and try them using the GUI.
 
 ## Understanding the Architecture and E-R Schema of the Database
 
