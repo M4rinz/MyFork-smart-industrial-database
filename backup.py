@@ -1,3 +1,4 @@
+import argparse
 import os
 import subprocess
 from datetime import datetime
@@ -60,13 +61,26 @@ def backup_postgres_database(db_name, user, password, host='localhost', port=543
         print(f"An error occurred during the backup: {e}")
 
 
-# Configuration
-DB_NAME = "KPI_database"
-DB_USER = "postgres"
-DB_PASSWORD = "password"
-DB_HOST = "172.17.0.2"
-DB_PORT = 5432
-BACKUP_DIR = "backups_encrypted"
+def main():
+    # Create the parser
+    parser = argparse.ArgumentParser(description="Process model_name from the terminal.")
+    parser.add_argument("db_name", type=str, help="database name")
+    parser.add_argument("db_username", type=str, help="database user name")
+    parser.add_argument("db_password", type=str, help="Database user password")
+    parser.add_argument("db_host", type=str, help="Database address")
+    parser.add_argument("db_port", type=str, help="Database port")
+    parser.add_argument("backup_dir", type=str, help="Directory where to store backups")
+    args = parser.parse_args()
+    # Configuration
+    DB_NAME = args.db_name
+    DB_USER = args.db_username
+    DB_PASSWORD = args.db_password
+    DB_HOST = args.db_host
+    DB_PORT = args.db_port
+    BACKUP_DIR = args.backup_dir
 
-# Perform the backup
-backup_postgres_database(DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, BACKUP_DIR)
+    # Perform the backup
+    backup_postgres_database(DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, BACKUP_DIR)
+
+if __name__ == "__main__":
+    main()
