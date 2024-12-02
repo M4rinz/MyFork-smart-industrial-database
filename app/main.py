@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 import psycopg2
-import pandas as pd
 from datetime import datetime
 from pydantic import BaseModel
 from fastapi import FastAPI, HTTPException
@@ -19,7 +18,9 @@ DB_NAME = "KPI_database"
 DB_USER = "postgres"
 DB_PASSWORD = "password"
 
+
 app = FastAPI()
+
 
 class AnomalyDataRequest(BaseModel):
     timestamp: datetime
@@ -34,15 +35,16 @@ class AnomalyDataRequest(BaseModel):
     var: float
     anomaly: str
 
-@app.get("/machines", summary="Fetch machine records", 
+
+@app.get("/machines", summary="Fetch machine records",
          description="This endpoint retrieves all records from the machines table in the database, displaying details about each machine.")
 async def fetch_machines():
     try:
         with psycopg2.connect(
-            host=DB_HOST,
-            database=DB_NAME,
-            user=DB_USER,
-            password=DB_PASSWORD
+                host=DB_HOST,
+                database=DB_NAME,
+                user=DB_USER,
+                password=DB_PASSWORD
         ) as conn:
             with conn.cursor() as cursor:
                 print("Connessione al database riuscita.")
@@ -55,22 +57,68 @@ async def fetch_machines():
                 print("\nRisultati della query:")
                 for row in machines:
                     print(row)
-        
+
         return {"message": "Machines fetched successfully", "data": machines}
 
     except Exception as e:
         print(f"An error occurred: {e}")
         return {"message": "An error occurred", "error": str(e)}
-    
-@app.get("/maintenance_records", summary="Fetch maintenance records", 
+
+
+@app.get("/query", summary="Fetch query records", )
+async def fetch_query(statement: str):
+    print("Statement", statement)
+    try:
+        with psycopg2.connect(
+                host=DB_HOST,
+                database=DB_NAME,
+                user=DB_USER,
+                password=DB_PASSWORD
+        ) as conn:
+            with conn.cursor() as cursor:
+                print("Connessione al database riuscita.")
+
+                # Query the machines table to fetch all rows
+                cursor.execute(statement)
+                result = cursor.fetchall()
+
+        return {"message": "Query fetched successfully", "data": result}
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return {"message": "An error occurred", "error": str(e)}
+
+
+@app.post("/insert", summary="Insert records", )
+async def insert_query(statement: str, data: dict):
+    try:
+        with psycopg2.connect(
+                host=DB_HOST,
+                database=DB_NAME,
+                user=DB_USER,
+                password=DB_PASSWORD
+        ) as conn:
+            with conn.cursor() as cursor:
+                # Query the machines table to fetch all rows
+                cursor.execute(statement, data)
+                conn.commit()
+
+        return {"message": "Query inserted successfully"}
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return {"message": "An error occurred", "error": str(e)}
+
+
+@app.get("/maintenance_records", summary="Fetch maintenance records",
          description="This endpoint retrieves all maintenance records from the database and displays them.")
 async def fetch_maintenance_records():
     try:
         with psycopg2.connect(
-            host=DB_HOST,
-            database=DB_NAME,
-            user=DB_USER,
-            password=DB_PASSWORD
+                host=DB_HOST,
+                database=DB_NAME,
+                user=DB_USER,
+                password=DB_PASSWORD
         ) as conn:
             with conn.cursor() as cursor:
                 print("Connessione al database riuscita.")
@@ -85,15 +133,15 @@ async def fetch_maintenance_records():
         return {"message": "An error occurred", "error": str(e)}
 
 
-@app.get("/real_time_data", summary="Fetch real-time data", 
+@app.get("/real_time_data", summary="Fetch real-time data",
          description="This endpoint retrieves all real-time data related to KPIs from the database, enabling live performance tracking.")
 async def fetch_personal_data():
     try:
         with psycopg2.connect(
-            host=DB_HOST,
-            database=DB_NAME,
-            user=DB_USER,
-            password=DB_PASSWORD
+                host=DB_HOST,
+                database=DB_NAME,
+                user=DB_USER,
+                password=DB_PASSWORD
         ) as conn:
             with conn.cursor() as cursor:
                 print("Connessione al database riuscita.")
@@ -107,15 +155,16 @@ async def fetch_personal_data():
         print(f"An error occurred: {e}")
         return {"message": "An error occurred", "error": str(e)}
 
-@app.get("/production_logs", summary="Fetch production logs", 
+
+@app.get("/production_logs", summary="Fetch production logs",
          description="This endpoint retrieves all production logs from the database, useful for monitoring and analytics purposes.")
 async def fetch_production_logs():
     try:
         with psycopg2.connect(
-            host=DB_HOST,
-            database=DB_NAME,
-            user=DB_USER,
-            password=DB_PASSWORD
+                host=DB_HOST,
+                database=DB_NAME,
+                user=DB_USER,
+                password=DB_PASSWORD
         ) as conn:
             with conn.cursor() as cursor:
                 print("Connessione al database riuscita.")
@@ -128,6 +177,7 @@ async def fetch_production_logs():
     except Exception as e:
         print(f"An error occurred: {e}")
         return {"message": "An error occurred", "error": str(e)}
+
 
 # TODO, implement a query to return requested data to allow group 3 to do their calculations.
 # Please check the data format of the return. 
@@ -156,10 +206,10 @@ from math import isnan
 async def get_historical_data():
     try:
         with psycopg2.connect(
-            host=DB_HOST,
-            database=DB_NAME,
-            user=DB_USER,
-            password=DB_PASSWORD
+                host=DB_HOST,
+                database=DB_NAME,
+                user=DB_USER,
+                password=DB_PASSWORD
         ) as conn:
             with conn.cursor() as cursor:
                 cursor.execute("SELECT * FROM real_time_data")
@@ -179,7 +229,8 @@ async def get_historical_data():
 
 
 
-        
+
+
 # TODO, implement the query for the endpoint.
 # This endpoint should allow group 3 to post data inside the database. 
 # The data that should be stored is like this 
@@ -203,28 +254,28 @@ async def get_historical_data():
 async def post_data_point(data: AnomalyDataRequest):
     try:
         with psycopg2.connect(
-            host=DB_HOST,
-            database=DB_NAME,
-            user=DB_USER,
-            password=DB_PASSWORD
+                host=DB_HOST,
+                database=DB_NAME,
+                user=DB_USER,
+                password=DB_PASSWORD
         ) as conn:
             with conn.cursor() as cursor:
                 print("parameters")
                 # Print to check if parameters are passed correctly.
                 print(data.timestamp, data.isset_id, data.name, data.kpi, data.operation,
                       data.sum, data.avg, data.min, data.max, data.var, data.anomaly)
-                
+
                 # TODO implement the real query.
                 query = """
                     SELECT 1 WHERE 1 = 1;
                 """
-                
-                cursor.execute(query, (data.timestamp, data.isset_id, data.name, data.kpi, 
-                                       data.operation, data.sum, data.avg, data.min, 
+
+                cursor.execute(query, (data.timestamp, data.isset_id, data.name, data.kpi,
+                                       data.operation, data.sum, data.avg, data.min,
                                        data.max, data.var, data.anomaly))
-                
+
                 logs = cursor.fetchall()
-        return {"data": logs}  
+        return {"data": logs}
     except Exception as e:
         print(f"An error occurred: {e}")
         return {"message": "An error occurred", "error": str(e)}
