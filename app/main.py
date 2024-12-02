@@ -3,6 +3,16 @@ import psycopg2
 import pandas as pd
 from datetime import datetime
 from pydantic import BaseModel
+from fastapi import FastAPI, HTTPException
+from datetime import datetime
+import psycopg2
+import os
+import json
+from fastapi.encoders import jsonable_encoder
+from fastapi import Query
+from typing import Optional
+from math import isnan, isinf
+
 
 DB_HOST = "172.17.0.2"
 DB_NAME = "KPI_database"
@@ -127,15 +137,23 @@ async def fetch_production_logs():
 # so a list of records like:
 #     machine_name, asset_id, kpi, operation, timestamp_start, timestamp_end
 # Test the endpoint before pushing so that we are sure that group 3 can use it.
+
+
+def safe_float(val):
+    if isinstance(val, float):
+        if val == float('inf') or val == float('-inf'):
+            return str(val)  # Convert infinite values to a string representation
+        if isnan(val):
+            return None  # Convert NaN values to None
+    return val
+
+def row_to_dict(columns, row):
+    return {col: safe_float(value) for col, value in zip(columns, row)}
+
+from math import isnan
+
 @app.get("/historical_data")
-async def get_historical_data(
-    machine_name: str,
-    asset_id: str,
-    kpi: str,
-    operation: str,
-    timestamp_start: datetime,
-    timestamp_end: datetime
-):
+async def get_historical_data():
     try:
         with psycopg2.connect(
             host=DB_HOST,
@@ -144,20 +162,23 @@ async def get_historical_data(
             password=DB_PASSWORD
         ) as conn:
             with conn.cursor() as cursor:
-                print(machine_name, asset_id, kpi, operation, timestamp_start, timestamp_end) 
-                #TODO implement the real query.
-                query = """
-                    SELECT 1 WHERE 1 = 1; 
-                """
-                
-                cursor.execute(query, (machine_name, asset_id, kpi, operation, timestamp_start, timestamp_end))
-                print(machine_name, asset_id, kpi, operation, timestamp_start, timestamp_end)
-                logs = cursor.fetchall()
-                
-        return logs 
+                cursor.execute("SELECT * FROM real_time_data")
+                rows = cursor.fetchall()
+                columns = [desc[0] for desc in cursor.description]  # This retrieves column names from cursor
+
+                data = [row_to_dict(columns, row) for row in rows]
+
+                if not data:
+                    print("No data found.")
+                return {"data": data}
     except Exception as e:
         print(f"An error occurred: {e}")
         return {"message": "An error occurred", "error": str(e)}
+
+
+
+
+
         
 # TODO, implement the query for the endpoint.
 # This endpoint should allow group 3 to post data inside the database. 
