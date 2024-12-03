@@ -3,11 +3,13 @@ import os
 import subprocess
 from datetime import datetime
 from cryptography.fernet import Fernet
+from dotenv import load_dotenv
+import os
+
 
 
 def load_key():
-    with open("backups_decryption/enc_key.key", "rb") as key_file:
-        return key_file.read()
+    return os.getenv("KEY")
 
 
 def encrypt_backup_file(filename, file_data):
@@ -62,22 +64,24 @@ def backup_postgres_database(db_name, user, password, host='localhost', port=543
 
 
 def main():
+    load_dotenv()
+
     # Create the parser
-    parser = argparse.ArgumentParser(description="Process model_name from the terminal.")
+    '''parser = argparse.ArgumentParser(description="Process model_name from the terminal.")
     parser.add_argument("db_name", type=str, help="database name")
     parser.add_argument("db_username", type=str, help="database user name")
     parser.add_argument("db_password", type=str, help="Database user password")
     parser.add_argument("db_host", type=str, help="Database address")
     parser.add_argument("db_port", type=str, help="Database port")
     parser.add_argument("backup_dir", type=str, help="Directory where to store backups")
-    args = parser.parse_args()
+    args = parser.parse_args()'''
     # Configuration
-    DB_NAME = args.db_name
-    DB_USER = args.db_username
-    DB_PASSWORD = args.db_password
-    DB_HOST = args.db_host
-    DB_PORT = args.db_port
-    BACKUP_DIR = args.backup_dir
+    DB_NAME = os.getenv('DB_NAME')
+    DB_USER = os.getenv('DB_USER')
+    DB_PASSWORD = os.getenv('DB_PASSWORD')
+    DB_HOST = os.getenv('DB_HOST')
+    DB_PORT =  os.getenv('DB_PORT')
+    BACKUP_DIR =  os.getenv('BACKUP_DIR')
 
     # Perform the backup
     backup_postgres_database(DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT, BACKUP_DIR)
