@@ -11,13 +11,14 @@ from fastapi.encoders import jsonable_encoder
 from fastapi import Query
 from typing import Optional
 from math import isnan, isinf
+from dotenv import load_dotenv
 
+load_dotenv()
 
-DB_HOST = "172.17.0.2"
-DB_NAME = "KPI_database"
-DB_USER = "postgres"
-DB_PASSWORD = "password"
-
+DB_HOST = os.getenv("DB_HOST")
+DB_NAME = os.getenv("DB_NAME")
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
 
 app = FastAPI()
 
@@ -197,10 +198,13 @@ def safe_float(val):
             return None  # Convert NaN values to None
     return val
 
+
 def row_to_dict(columns, row):
     return {col: safe_float(value) for col, value in zip(columns, row)}
 
+
 from math import isnan
+
 
 @app.get("/historical_data")
 async def get_historical_data():
@@ -224,10 +228,7 @@ async def get_historical_data():
     except Exception as e:
         print(f"An error occurred: {e}")
         return {"message": "An error occurred", "error": str(e)}
-
-
-
-
+    
 
 
 
@@ -266,8 +267,13 @@ async def post_data_point(data: AnomalyDataRequest):
                       data.sum, data.avg, data.min, data.max, data.var, data.anomaly)
 
                 # TODO implement the real query.
+                
                 query = """
-                    SELECT 1 WHERE 1 = 1;
+                    INSERT INTO real_time_data (
+                        timestamp, asset_id, name, kpi, operation, sum, avg, min, max, var, anomaly
+                    )
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    RETURNING id;
                 """
 
                 cursor.execute(query, (data.timestamp, data.isset_id, data.name, data.kpi,
@@ -278,4 +284,65 @@ async def post_data_point(data: AnomalyDataRequest):
         return {"data": logs}
     except Exception as e:
         print(f"An error occurred: {e}")
+        return {"message": "An error occurred", "error": str(e)}
+
+
+# FILTERED GET HISTORICAL DATA
+@app.get("/filtered_historical_data")
+def filtered_get_historical_data(machine_name:str, asset_id:str, kpi:str, operation:str, timestamp_start:datetime, timestamp_end:datetime):
+    try:
+        with psycopg2.connect(
+            host=DB_HOST,
+            database=DB_NAME,
+            user=DB_USER,
+            password=DB_PASSWORD
+            
+        ) as conn:
+            with conn.cursor() as cursor:
+                print("Connessione al database riuscita.")
+                # AL POSTO DI real_time_data METTERE IL NOME DELLA TABELLA
+                query = """
+                    SELECT * FROM real_time_data
+                """
+                conditions = []
+                params = []
+
+                if machine_name:
+                    conditions.append("name = %s")
+                    params.append(machine_name)
+
+                if asset_id:
+                    conditions.append("asset_id = %s")
+                    params.append(asset_id)
+
+                if kpi:
+                    conditions.append("kpi = %s")
+                    params.append(kpi)
+
+                if timestamp_start:
+                    conditions.append("time >= %s")
+                    params.append(timestamp_start)
+
+                if timestamp_end:
+                    conditions.append("time <= %s")
+                    params.append(timestamp_end)
+
+                # Aggiungi la clausola WHERE se ci sono condizioni
+                if conditions:
+                    query += " WHERE " + " AND ".join(conditions)
+
+                # Aggiungi l'ordinamento
+                query += " ORDER BY time ASC;"
+
+                # Esegui la query
+                cursor.execute(query, params)
+                data = cursor.fetchall()
+
+                # Print the results of the query
+                print("\nPrint the results of the query':")
+                for row in data:
+                    print(row)
+
+    except Exception as e:
+        print(f"Errore: {e}")
         return {"message": "An error occurred", "error": str(e)}
