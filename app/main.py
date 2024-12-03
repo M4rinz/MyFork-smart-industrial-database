@@ -11,13 +11,14 @@ from fastapi.encoders import jsonable_encoder
 from fastapi import Query
 from typing import Optional
 from math import isnan, isinf
+from dotenv import load_dotenv
 
+load_dotenv()
 
-DB_HOST = "172.17.0.2"
-DB_NAME = "KPI_database"
-DB_USER = "postgres"
-DB_PASSWORD = "password"
-
+DB_HOST = os.getenv("DB_HOST")
+DB_NAME = os.getenv("DB_NAME")
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
 
 app = FastAPI()
 
@@ -197,10 +198,13 @@ def safe_float(val):
             return None  # Convert NaN values to None
     return val
 
+
 def row_to_dict(columns, row):
     return {col: safe_float(value) for col, value in zip(columns, row)}
 
+
 from math import isnan
+
 
 @app.get("/historical_data")
 async def get_historical_data():
@@ -224,11 +228,6 @@ async def get_historical_data():
     except Exception as e:
         print(f"An error occurred: {e}")
         return {"message": "An error occurred", "error": str(e)}
-
-
-
-
-
 
 
 # TODO, implement the query for the endpoint.
