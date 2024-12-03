@@ -51,7 +51,7 @@ fi
 
 # Clean up: Remove the dump file from the container
 echo "🧹 Cleaning up: Removing the dump file from the container..."
-docker exec -i "$CONTAINER_NAME" bash -c "rm /tmp/backup.sql"
+docker exec --user root -i "$CONTAINER_NAME" bash -c "rm /tmp/backup.sql"
 if [ $? -ne 0 ]; then
     echo "❌ Error removing the dump file from the container."
     exit 1
