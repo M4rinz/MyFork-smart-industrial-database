@@ -270,6 +270,7 @@ async def get_historical_data():
 # And should go in the real-time data table. The AnomlayDataRequest object stores the informations that are needed to perform the query
 # there is an extra field called anomaly, that can be ignored if we don't want to use that, but they can identify anomalies so it's 
 # included. Test the endponits before pushing so that we are sure group 3 can use them.
+
 @app.post("/store_datapoint")
 async def post_data_point(data: AnomalyDataRequest):
     try:
@@ -538,6 +539,7 @@ const singleMachines = {
     totalConsumption: "",
     totalCost: "",
 }'''
+
 @app.get("/single_machine_detail")
 def single_machine_detail(machine_id,init_date,end_date):
     try:
@@ -621,3 +623,177 @@ def single_machine_detail(machine_id,init_date,end_date):
     except Exception as e:
         print(f"An error occurred: {e}")
         return {"message": "An error occurred", "error": str(e)}
+    
+"""
+// Machine Usage
+input: init_date, end_date
+// Energy
+const energy = {
+    totalPower: "",
+    totalConsumption: "",
+    totalCost: "",
+    energyContributions: "",
+    machines: [
+        {
+            machineId: "",
+            machineName: "",
+            machineStatus: "",
+            consumption: {
+                total: "",
+                working: "",
+                idle: ""
+            },
+            efficiency: {
+                energyEfficiencyRatio: "",
+                energyConsumptionPerUnit: ""
+            },
+            sustainability: {
+                renewableEnergyUsagePercentage: "",
+                carbonFootPrint: ""
+            }
+        },
+    ]
+}
+
+"""
+
+@app.get("/energy")
+def get_energy(init_date, end_date):
+    try:
+        with psycopg2.connect(
+                host=DB_HOST,
+                database=DB_NAME,
+                user=DB_USER,
+                password=DB_PASSWORD
+        ) as conn:
+            with conn.cursor() as cursor:
+           
+                init_date = datetime.fromisoformat(init_date)
+                end_date = datetime.fromisoformat(end_date)
+                query = query = """
+                WITH EnergySummary AS (
+                    SELECT 
+                        SUM(power) AS totalPower,
+                        SUM(consumption) AS totalConsumption,
+                        SUM(cost) AS totalCost,
+                        SUM(renewable_energy) / NULLIF(SUM(consumption), 0) * 100 AS energyContributions
+                    FROM real_time_data
+                    WHERE timestamp BETWEEN %(start_time)s AND %(end_time)s
+                ),
+                MachineDetails AS (
+                    SELECT 
+                        machine_id AS machineId,
+                        machine_name AS machineName,
+                        machine_status AS machineStatus,
+                        SUM(consumption) AS totalConsumption,
+                        SUM(CASE WHEN machine_status = 'working' THEN consumption ELSE 0 END) AS workingConsumption,
+                        SUM(CASE WHEN machine_status = 'idle' THEN consumption ELSE 0 END) AS idleConsumption,
+                        AVG(energy_efficiency_ratio) AS energyEfficiencyRatio,
+                        AVG(energy_consumption_per_unit) AS energyConsumptionPerUnit,
+                        SUM(renewable_energy) / NULLIF(SUM(consumption), 0) * 100 AS renewableEnergyUsagePercentage,
+                        SUM(carbon_footprint) AS carbonFootPrint
+                    FROM real_time_data
+                    WHERE timestamp BETWEEN %(start_time)s AND %(end_time)s
+                    GROUP BY machine_id, machine_name, machine_status
+                )
+                SELECT 
+                    es.totalPower,
+                    es.totalConsumption,
+                    es.totalCost,
+                    es.energyContributions,
+                    json_agg(
+                        json_build_object(
+                            'machineId', md.machineId,
+                            'machineName', md.machineName,
+                            'machineStatus', md.machineStatus,
+                            'consumption', json_build_object(
+                                'total', md.totalConsumption,
+                                'working', md.workingConsumption,
+                                'idle', md.idleConsumption
+                            ),
+                            'efficiency', json_build_object(
+                                'energyEfficiencyRatio', md.energyEfficiencyRatio,
+                                'energyConsumptionPerUnit', md.energyConsumptionPerUnit
+                            ),
+                            'sustainability', json_build_object(
+                                'renewableEnergyUsagePercentage', md.renewableEnergyUsagePercentage,
+                                'carbonFootPrint', md.carbonFootPrint
+                            )
+                        )
+                    ) AS machines
+                FROM EnergySummary es, MachineDetails md;
+                """
+                params = {
+                    'start_time': init_date,
+                    'end_time': end_date
+                }
+
+                cursor.execute(query, params)
+
+                result = cursor.fetchone()
+                if result:
+                    energy = {
+                        "totalPower": result[0],
+                        "totalConsumption": result[1],
+                        "totalCost": result[2],
+                        "energyContributions": result[3],
+                        "machines": json.loads(result[4])  # Decodifica il JSON restituito
+                    }
+                    return energy
+                else:
+                    return {"message": "No data found for the given range."}
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return {"error": str(e)}
+
+
+"""
+// Single Energy Detail
+const singleEnergy = {
+    machineId: "",
+    machineName: "",
+    machineStatus: "",
+    dataRange: "",
+    totalPower: "",
+    totalConsumption: "",
+    totalCost: "",
+    energyContributions: "",
+    workingConsumption: "",
+    idleConsumption: "",
+    energyEfficiencyRatio: "",
+    energyConsumptionPerUnit: "",
+    renewableEnergyUsagePercentage: "",
+    carbonFootprint: "",
+    chartType: "",
+    Chart: [
+        {
+            date: "",
+            totalConsumption: "",
+            workingConsumption: "",
+            idleConsumption: ""
+        },
+    ]
+}
+"""
+
+"""
+// Financial Report
+const Financial = {
+    dataRange: "",
+    grossMargin: "",
+    roi: "",
+    revenuePerEmployee: "",
+    salesGrowthRate: "",
+    totalOperationalCost: "",
+    costPerUnit: "",
+    costPerCycle: "",
+    totalEnergyCost: "",
+    chartType: "",
+    Chart: [
+        {
+            date: "",
+            operationalCost: "",
+        },
+    ]
+}
+"""
