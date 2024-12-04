@@ -122,10 +122,10 @@ docker images
 
 ```bash
 docker volume create pg_data
-docker run -d --name smart-database-container   -p 5432:5432 -p 8002:8002 -v pg_data:/var/lib/postgresql/data  smart-database
+docker run -d --name kpi-database -p 5432:5432 -p 8002:8002 -v pg_data:/var/lib/postgresql/data  smart-database
 ```
 
-This command will start a new Docker container named `smart-database-container` with the required environment variables and port mappings. From now on, you can use this container to interact with the smart-database instance.
+This command will start a new Docker container named `kpi-database` with the required environment variables and port mappings. From now on, you can use this container to interact with the smart-database instance.
 You can check the list of running Docker containers using the following command:
 The volume `pg_data` contains data for the persistency of the database.
 
@@ -134,17 +134,17 @@ docker ps
 ```
 
 If you remove the container, all the data will be stored in the `data` directory in the project root, so you can easily recreate the container with the same data by running the same command.
-3. Run the following commands to prepare the database:
+1. Run the following commands to prepare the database:
 
 ```bash
    chmod +x build_db.sh
 ```
 
 ```bash
-   ./build_db.sh smart-database-container exports.sql KPI_database
+   ./build_db.sh kpi-database exports.sql KPI_database
 ```
 
-This will create a new database named `KPI_database` in the `smart-database-container` instance and import the schema and initial data from the `exports.sql` file.
+This will create a new database named `KPI_database` in the `kpi-database` instance and import the schema and initial data from the `exports.sql` file.
 
 ### Using pgAdmin (optional)
 
