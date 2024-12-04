@@ -623,7 +623,8 @@ def single_machine_detail(machine_id,init_date,end_date):
     except Exception as e:
         print(f"An error occurred: {e}")
         return {"message": "An error occurred", "error": str(e)}
-    
+
+
 """
 // Machine Usage
 input: init_date, end_date
@@ -749,6 +750,7 @@ def get_energy(init_date, end_date):
 
 """
 // Single Energy Detail
+input : machine_id, init_date, end_date
 const singleEnergy = {
     machineId: "",
     machineName: "",
@@ -776,6 +778,112 @@ const singleEnergy = {
 }
 """
 
+@app.get("/single_energy_detail")
+def single_energy_detail(machine_id, time_start, time_end):
+    try:
+        with psycopg2.connect(
+                host=DB_HOST,
+                database=DB_NAME,
+                user=DB_USER,
+                password=DB_PASSWORD
+        ) as conn:
+            with conn.cursor() as cursor:
+                query = """
+                WITH MachineSummary AS (
+                    SELECT 
+                        machine_id AS machineId,
+                        machine_name AS machineName,
+                        machine_status AS machineStatus,
+                        %(time_start)s || ' to ' || %(time_end)s AS dataRange,
+                        SUM(power) AS totalPower,
+                        SUM(consumption) AS totalConsumption,
+                        SUM(cost) AS totalCost,
+                        SUM(renewable_energy) / NULLIF(SUM(consumption), 0) * 100 AS energyContributions,
+                        SUM(CASE WHEN machine_status = 'working' THEN consumption ELSE 0 END) AS workingConsumption,
+                        SUM(CASE WHEN machine_status = 'idle' THEN consumption ELSE 0 END) AS idleConsumption,
+                        AVG(energy_efficiency_ratio) AS energyEfficiencyRatio,
+                        AVG(energy_consumption_per_unit) AS energyConsumptionPerUnit,
+                        SUM(renewable_energy) / NULLIF(SUM(consumption), 0) * 100 AS renewableEnergyUsagePercentage,
+                        SUM(carbon_footprint) AS carbonFootprint
+                    FROM historical_data
+                    WHERE machine_id = %(machine_id)s
+                      AND timestamp BETWEEN %(time_start)s AND %(time_end)s
+                    GROUP BY machine_id, machine_name, machine_status
+                ),
+                MachineChart AS (
+                    SELECT 
+                        DATE(timestamp) AS date,
+                        SUM(consumption) AS totalConsumption,
+                        SUM(CASE WHEN machine_status = 'working' THEN consumption ELSE 0 END) AS workingConsumption,
+                        SUM(CASE WHEN machine_status = 'idle' THEN consumption ELSE 0 END) AS idleConsumption
+                    FROM historical_data
+                    WHERE machine_id = %(machine_id)s
+                      AND timestamp BETWEEN %(time_start)s AND %(time_end)s
+                    GROUP BY DATE(timestamp)
+                )
+                SELECT 
+                    ms.machineId,
+                    ms.machineName,
+                    ms.machineStatus,
+                    ms.dataRange,
+                    ms.totalPower,
+                    ms.totalConsumption,
+                    ms.totalCost,
+                    ms.energyContributions,
+                    ms.workingConsumption,
+                    ms.idleConsumption,
+                    ms.energyEfficiencyRatio,
+                    ms.energyConsumptionPerUnit,
+                    ms.renewableEnergyUsagePercentage,
+                    ms.carbonFootprint,
+                    'line' AS chartType,
+                    json_agg(
+                        json_build_object(
+                            'date', mc.date,
+                            'totalConsumption', mc.totalConsumption,
+                            'workingConsumption', mc.workingConsumption,
+                            'idleConsumption', mc.idleConsumption
+                        )
+                    ) AS chart
+                FROM MachineSummary ms, MachineChart mc;
+                """
+                
+                params = {
+                    "machine_id": machine_id,
+                    "time_start": time_start,
+                    "time_end": time_end
+                }
+                
+                cursor.execute(query, params)
+                
+                result = cursor.fetchone()
+                if result:
+                    singleEnergy = {
+                        "machineId": result[0],
+                        "machineName": result[1],
+                        "machineStatus": result[2],
+                        "dataRange": result[3],
+                        "totalPower": result[4],
+                        "totalConsumption": result[5],
+                        "totalCost": result[6],
+                        "energyContributions": result[7],
+                        "workingConsumption": result[8],
+                        "idleConsumption": result[9],
+                        "energyEfficiencyRatio": result[10],
+                        "energyConsumptionPerUnit": result[11],
+                        "renewableEnergyUsagePercentage": result[12],
+                        "carbonFootprint": result[13],
+                        "chartType": result[14],
+                        "Chart": json.loads(result[15])  
+                    }
+                    return singleEnergy
+                else:
+                    return {"message": "No data found for the given range."}
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return {"error": str(e)}
+                
+
 """
 // Financial Report
 const Financial = {
@@ -797,3 +905,7 @@ const Financial = {
     ]
 }
 """
+
+
+
+
