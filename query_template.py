@@ -1,5 +1,6 @@
 import psycopg2
 import pandas as pd
+from datetime import datetime
 from os import path
 
 DB_HOST = "172.17.0.2"
@@ -58,3 +59,35 @@ try:
 
 except Exception as e:
     print(f"Errore: {e}")
+
+
+def get_historical_data(machine_name:str, asset_id:str, kpi:str, operation:str, timestamp_start:datetime, timestamp_end:datetime):
+    
+    try:
+        with psycopg2.connect(
+            host=DB_HOST,
+            database=DB_NAME,
+            user=DB_USER,
+            password=DB_PASSWORD
+            
+        ) as conn:
+            with conn.cursor() as cursor:
+                print("Connessione al database riuscita.")
+
+                cursor.execute(
+                    """
+                    SELECT * FROM real_time_data
+                    WHERE name = %s AND asset_id = %s AND kpi = %s AND time >= %s AND time <= %s
+                    ORDER BY time ASC;
+                    """,
+                    (machine_name, asset_id, kpi, timestamp_start, timestamp_end)
+                )
+                data = cursor.fetchall()
+
+                # Print the results of the query
+                print("\nPrint the results of the query':")
+                for row in data:
+                    print(row)
+
+    except Exception as e:
+        print(f"Errore: {e}")
