@@ -47,13 +47,14 @@ RUN python3 -m venv /opt/venv && /opt/venv/bin/pip install psycopg2-binary fasta
 ENV POSTGRES_USER=postgres
 ENV POSTGRES_PASSWORD=password
 ENV POSTGRES_DB=KPI_database
-
+ENV POSTGRES_HOST_AUTH_METHOD=md5
 # Expose PostgreSQL and FastAPI ports
 EXPOSE 5432
 EXPOSE 8002
 
 # Copy the application directory into the container
 COPY ./app /app
+COPY ./exports.sql /docker-entrypoint-initdb.d/exports.sql
 
 # Change ownership of the app directory to avoid permission issues
 RUN chown -R postgres:postgres /app
