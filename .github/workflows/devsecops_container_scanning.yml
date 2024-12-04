@@ -2,7 +2,7 @@ name: Security Scan Pipeline (Secret Scanning, SCA, SAST, IaC, Container Scannin
 
 on:
   schedule:
-    - cron: '0 0 * * 1'  # Runs every Monday at midnight UTC
+    - cron: '0 0 * * *'  # Runs every day at midnight UTC
 
 permissions:
   contents: read
@@ -233,12 +233,6 @@ jobs:
         with:
           sarif_file: 'trivy-container_sarif-report.sarif'
 
-
-
-
-
-
-  # Trivy to do Container Scanning?
 
 
   # OWASP ZAP to do Dynamic Application Security Test (DAST)?
