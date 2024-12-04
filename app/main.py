@@ -1,3 +1,4 @@
+import math
 from fastapi import FastAPI
 import psycopg2
 from datetime import datetime
@@ -12,7 +13,8 @@ from fastapi import Query
 from typing import Optional
 from math import isnan, isinf
 from dotenv import load_dotenv
-
+import hashlib
+import random
 load_dotenv()
 
 DB_HOST = os.getenv("DB_HOST")
@@ -35,6 +37,23 @@ class AnomalyDataRequest(BaseModel):
     max: float
     var: float
     anomaly: str
+
+class UserRequest(BaseModel):
+      email: str
+      password: str
+      username: str    
+      role: str
+
+class LoginRequest(BaseModel):
+      username: str
+      password: str
+
+class DashboardObj(BaseModel):
+    totalMachines: int
+    totalConsumptionPerDay: float
+    totalCostPerDay: float
+    totalAlarm: float
+    costAnalysis: float
 
 
 @app.get("/machines", summary="Fetch machine records",
@@ -345,4 +364,260 @@ def filtered_get_historical_data(machine_name:str, asset_id:str, kpi:str, operat
 
     except Exception as e:
         print(f"Errore: {e}")
+        return {"message": "An error occurred", "error": str(e)}
+    
+#hash strings, such as password
+def hash_string(in_string: str) -> str:
+    hashed_string = hashlib.sha256(in_string.encode('utf-8')).hexdigest()
+    return hashed_string
+
+# Query endpoints for frontend
+'''
+const user = {
+    email: "String",
+    password: "String",
+    username: "String",
+    role: "User Role (SMO / FFM)"
+}'''
+@app.post("/register")
+async def register_user(user: UserRequest):
+    try:
+        with psycopg2.connect(
+                host=DB_HOST,
+                database=DB_NAME,
+                user=DB_USER,
+                password=DB_PASSWORD
+        ) as conn:
+            with conn.cursor() as cursor:
+               
+                # Print to check if parameters are passed correctly.
+                print(user)
+
+                # TODO implement the real query.
+
+                query = """
+                    SELECT COUNT(*) 
+                    FROM users 
+                    WHERE username = %s OR email = %s
+                """
+                cursor.execute(query, (user.username, user.email))
+
+                res = cursor.fetchall()
+                if res[0][0] >= 1:
+                    return {"message":"Duplicate username or email"}
+                
+                query = """
+                    INSERT INTO users (
+                        username, password, email, role
+                    )
+                    VALUES (%s, %s, %s, %s)
+                    RETURNING userid;
+                """
+
+                cursor.execute(query, (user.username,hash_string(user.password),user.email,user.role))
+
+                logs = cursor.fetchall()
+        return {"data": logs}
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return {"message": "An error occurred", "error": str(e)}
+    
+@app.post("/login")
+async def login(user: LoginRequest):
+    try:
+        with psycopg2.connect(
+                host=DB_HOST,
+                database=DB_NAME,
+                user=DB_USER,
+                password=DB_PASSWORD
+        ) as conn:
+            with conn.cursor() as cursor:
+               
+                # Print to check if parameters are passed correctly.
+                print(user)
+
+                # TODO implement the real query.
+                
+                query = """
+                    Select * from users where username = %s and password = %s
+                """
+
+                cursor.execute(query, (user.username,hash_string(user.password)))
+
+                logs = cursor.fetchall()
+                print(len(logs))
+                if len(logs) == 0:
+                    return {"message":"login failed"}
+                    
+        return {"message":"login successful"}
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return {"message": "An error occurred", "error": str(e)}
+
+'''
+const dashboard = {
+    totalMachines: "",
+    totalConsumptionPerDay: "",
+    totalCostPerDay: "",
+    totalAlarm: "",
+    costAnalysis: {},
+    recentlyViewed: {
+        machineUsage: [{}],
+        energy: [{}],
+        production: [{}]
+    }
+}
+'''
+#dashboard = DashboardObj()
+@app.get("/get_machines")
+async def get_machines(init_date, end_date):
+    try:
+        with psycopg2.connect(
+                host=DB_HOST,
+                database=DB_NAME,
+                user=DB_USER,
+                password=DB_PASSWORD
+        ) as conn:
+            with conn.cursor() as cursor:
+                timestamp = datetime.strptime(init_date, "%Y-%m-%d %H:%M:%S")
+
+                init_date = datetime.fromisoformat(init_date)
+                end_date = datetime.fromisoformat(end_date)
+                # Print to check if parameters are passed correctly.
+                # TODO implement the real query.
+                
+
+                query = """
+                        select Count(*) from machines 
+                    """
+                cursor.execute(query)
+                total_machines = cursor.fetchall()[0][0]
+                print(total_machines)
+
+
+                query = """
+                    Select sum from real_time_data where time >= %s and time <= %s and kpi = %s
+                """
+                cursor.execute(query,(init_date,end_date,"consumption"))
+
+                logs = cursor.fetchall()
+                consumption_sum = 0
+                for log in logs:
+                    consumption_sum += log[0]
+                
+                query = """
+                    Select sum from real_time_data where time >= %s and time <= %s and kpi = %s
+                """
+                cursor.execute(query,(init_date,end_date,"cost"))
+
+                logs = cursor.fetchall()
+                cost_sum = 0
+                for log in logs:
+                    cost_sum += log[0]                    
+
+
+                # Create a sequence of integers representing the components of the timestamp
+                timestamp_ints = [timestamp.year, timestamp.month, timestamp.day, timestamp.hour, timestamp.minute, timestamp.second]
+                random.seed(sum(timestamp_ints))
+                consumption_sum = 0 if math.isnan(consumption_sum) else consumption_sum
+                cost_sum = 0 if math.isnan(cost_sum) else cost_sum
+
+        return {"data":{"totalMachines":total_machines,"totalConsumptionPerDay":consumption_sum,"totalCostPerDay":cost_sum,"totalAlarm":random.randint(0,3)}}
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return {"message": "An error occurred", "error": str(e)}
+    
+
+'''// Single Machine Detail
+const singleMachines = {
+    machineId: "",
+    machineName: "",
+    machineStatus: "",
+    dataRange: "",
+    totalPower: "",
+    totalConsumption: "",
+    totalCost: "",
+}'''
+@app.get("/single_machine_detail")
+def single_machine_detail(machine_id,init_date,end_date):
+    try:
+        with psycopg2.connect(
+                host=DB_HOST,
+                database=DB_NAME,
+                user=DB_USER,
+                password=DB_PASSWORD
+        ) as conn:
+            with conn.cursor() as cursor:
+               
+                # Print to check if parameters are passed correctly
+
+                # TODO implement the real query.
+                
+                print("hello")
+                query = """
+                    Select name from machines where asset_id = %s
+                """
+
+                cursor.execute(query, (machine_id,))
+                logs = cursor.fetchall()
+                machineName = logs[0][0]
+                init_date = datetime.fromisoformat(init_date)
+                end_date = datetime.fromisoformat(end_date)
+                query = """
+                    Select operations from real_time_data where asset_id = %s and time >= %s and time <= %s
+                """
+
+                cursor.execute(query, (machine_id,init_date,end_date))
+                logs = cursor.fetchall()
+                machineStatus = logs[0][0]
+                datarange = [init_date,end_date]            
+                query = """
+                    Select sum from real_time_data where time >= %s and time <= %s and kpi = %s and asset_id = %s
+                """
+                cursor.execute(query,(init_date,end_date,"consumption",machine_id))
+
+                logs = cursor.fetchall()
+                consumption_sum = 0
+                for log in logs:
+                    consumption_sum += log[0]
+                
+                query = """
+                    Select sum from real_time_data where time >= %s and time <= %s and kpi = %s and asset_id = %s
+                """
+                cursor.execute(query,(init_date,end_date,"cost",machine_id))
+
+                logs = cursor.fetchall()
+                cost_sum = 0
+                for log in logs:
+                    cost_sum += log[0]
+
+                query = """
+                    Select sum from real_time_data where time >= %s and time <= %s and kpi = %s and asset_id = %s
+                """
+                cursor.execute(query,(init_date,end_date,"power",machine_id))
+
+                logs = cursor.fetchall()
+                total_power = 0
+                for log in logs:
+                    total_power += log[0]
+
+                consumption_sum = 0 if math.isnan(consumption_sum) else consumption_sum
+                cost_sum = 0 if math.isnan(cost_sum) else cost_sum
+                total_power = 0 if math.isnan(total_power) else total_power
+                # Construct and return the final response object
+                single_machine_detail = {
+                    "machineId": machine_id,
+                    "machineName": machineName,
+                    "machineStatus": machineStatus,
+                    "dataRange": datarange,
+                    "totalPower": total_power,
+                    "totalConsumption": consumption_sum,
+                    "totalCost": cost_sum
+                }
+
+                print(single_machine_detail)
+            return {"data":single_machine_detail}
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
         return {"message": "An error occurred", "error": str(e)}
